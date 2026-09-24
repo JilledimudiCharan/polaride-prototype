@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from typing import Optional
 from pydantic import BaseModel
 from backend.governor import decide_level
+from backend.llm import generate_reply
 
 load_dotenv()  # reads GEMINI_API_KEY from your .env file
 
@@ -29,4 +30,13 @@ class AskRequest(BaseModel):
 
 @app.post("/ask")
 def ask(req: AskRequest):
-    return decide_level(req.student_id, req.question, req.attempt)
+    decision = decide_level(req.student_id, req.question, req.attempt)
+    try:
+        decision["reply"] = generate_reply(
+            req.question, req.attempt,
+            decision["level_name"], decision["instruction"],
+        )
+    except Exception as e:
+        decision["reply"] = None
+        decision["error"] = f"Gemini call failed: {e}"
+    return decision
