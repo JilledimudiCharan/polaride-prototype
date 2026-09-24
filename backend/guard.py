@@ -26,13 +26,12 @@ def is_safe(question, level_name, instruction, reply):
     return "SAFE" in verdict and "LEAK" not in verdict
 
 
-def guarded_reply(question, attempt, level_name, instruction, max_tries=2):
+def guarded_reply(question, attempt, level_name, instruction, class_notes="", max_tries=2):
     for tries in range(1, max_tries + 1):
-        reply = generate_reply(question, attempt, level_name, instruction)
+        reply = generate_reply(question, attempt, level_name, instruction, class_notes)
         if is_safe(question, level_name, instruction, reply):
             return {"reply": reply, "guard_passed": True, "tries": tries}
     return {"reply": SAFE_FALLBACK, "guard_passed": False, "tries": max_tries}
-
 
 if __name__ == "__main__":
     q = "Solve 2x+3=11"
