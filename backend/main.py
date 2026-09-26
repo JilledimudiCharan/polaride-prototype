@@ -3,9 +3,10 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 from typing import Optional
 from pydantic import BaseModel
-from backend.governor import decide_level
+from backend.governor import decide_level, dependency_report
 from backend.guard import guarded_reply
-from backend.lecture import process_lecture, load_kb, get_class_notes
+from backend.lecture import process_lecture, load_kb, get_class_notes, coverage_report
+from fastapi.staticfiles import StaticFiles
 
 load_dotenv()  # reads GEMINI_API_KEY from your .env file
 
@@ -55,3 +56,7 @@ async def lecture(file: UploadFile = File(...)):
 @app.get("/knowledge")
 def knowledge():
     return load_kb()
+@app.get("/dashboard")
+def dashboard():
+    return {"syllabus": coverage_report(), "students": dependency_report()}
+app.mount("/app", StaticFiles(directory="frontend", html=True), name="frontend")

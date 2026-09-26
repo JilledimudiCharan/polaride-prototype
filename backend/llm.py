@@ -5,7 +5,7 @@ from google.genai import types
 
 load_dotenv()
 
-MODEL = "gemini-2.5-flash"  # if you get a "model not found" error, change only this line
+MODEL = "gemini-2.5-flash-lite"  # if you get a "model not found" error, change only this line
 client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
 

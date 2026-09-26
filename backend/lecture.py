@@ -51,3 +51,26 @@ def get_class_notes():
     for lec in kb["lectures"]:
         parts.append(f"Summary: {lec['summary']}\nTopics: {', '.join(lec['topics'])}")
     return "\n\n".join(parts)
+SYLLABUS_FILE = "syllabus.json"
+
+
+def coverage_report():
+    with open(SYLLABUS_FILE, encoding="utf-8") as f:
+        syllabus = json.load(f)
+
+    taught = [t.lower() for lec in load_kb()["lectures"] for t in lec["topics"]]
+    covered, pending = [], []
+    for topic in syllabus["topics"]:
+        t = topic.lower()
+        if any(t in x or x in t for x in taught):
+            covered.append(topic)
+        else:
+            pending.append(topic)
+
+    total = len(syllabus["topics"])
+    return {
+        "subject": syllabus["subject"],
+        "covered": covered,
+        "pending": pending,
+        "coverage_percent": round(len(covered) / total * 100) if total else 0,
+    }

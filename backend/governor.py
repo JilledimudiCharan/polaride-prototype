@@ -45,3 +45,21 @@ def decide_level(student_id, question, attempt=None):
         "instruction": INSTRUCTIONS[LEVELS[level]],
         "message": message,
     }
+def dependency_report():
+    per_student = {}
+    for (sid, _q), level in progress.items():
+        per_student.setdefault(sid, []).append(level)
+
+    report = []
+    for sid, levels in per_student.items():
+        avg = sum(levels) / len(levels)
+        score = round(avg / (len(LEVELS) - 1) * 100)
+        label = "Low" if score < 25 else "Moderate" if score < 60 else "High"
+        report.append({
+            "student_id": sid,
+            "questions": len(levels),
+            "ai_dependency_percent": score,
+            "dependency_level": label,
+            "requests": stats.get(sid, {}).get("requests", 0),
+        })
+    return report
