@@ -57,8 +57,9 @@ Open **http://127.0.0.1:8000/app/**
 5. Go to **Dashboard** → see syllabus coverage % and per-student AI-dependency scores
 
 ## Screenshots
-| Refuses to skip levels | Escalates with attempt | Lecture summary | Dashboard |
 
+| Refuses to skip levels | Escalates with attempt | Lecture summary | Dashboard |
+|---|---|---|---|
 | ![](docs/screenshots/refuse.png) | ![](docs/screenshots/escalate.png) | ![](docs/screenshots/lecture.png) | ![](docs/screenshots/dashboard.png) |
 
 ## Known limitations (prototype scope)
