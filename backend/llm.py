@@ -40,6 +40,7 @@ def generate_reply(question, attempt, level_name, instruction, class_notes=""):
             "\n\nUse the same methods and terms as the class. "
             "If the question is outside these topics, still guide the student, "
             "but mention it hasn't been covered in class yet."
+            "Do not use LaTeX or $ symbols. Write math in plain text, like x = 5."
         )
 
     prompt = f"Student question: {question}"

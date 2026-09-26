@@ -1,4 +1,12 @@
 {
   "subject": "Mathematics (sample)",
-  "topics": ["Linear equations", "Quadratic equations", "Fractions", "Geometry basics"]
+  "topics": [
+    "Linear equations",
+    "Quadratic equations",
+    "Pythagorean theorem",
+    "Circles and area",
+    "Probability basics",
+    "Fractions",
+    "Geometry basics"
+  ]
 }
