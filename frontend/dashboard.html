@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Dashboard - POLARIDE</title>
+<link rel="stylesheet" href="style.css"></head>
+<body>
+<nav><a href="index.html">Home</a><a href="student.html">Student</a><a href="teacher.html">Teacher</a></nav>
+<h1>Teacher Dashboard</h1>
+<button onclick="load()">Refresh</button>
+
+<div class="card">
+  <h3 id="subject">Syllabus coverage</h3>
+  <div class="bar"><div id="fill" style="width:0%"></div></div>
+  <p id="pct" class="muted"></p>
+  <p><b>Covered:</b> <span id="covered"></span></p>
+  <p><b>Pending:</b> <span id="pending"></span></p>
+</div>
+
+<div class="card">
+  <h3>Student AI dependency</h3>
+  <table>
+    <thead><tr><th>Student</th><th>Questions</th><th>Requests</th><th>Dependency</th></tr></thead>
+    <tbody id="rows"></tbody>
+  </table>
+</div>
+
+<script>
+async function load() {
+  const d = await (await fetch("/dashboard")).json();
+  const s = d.syllabus;
+  document.getElementById("subject").textContent = "Syllabus coverage: " + s.subject;
+  document.getElementById("fill").style.width = s.coverage_percent + "%";
+  document.getElementById("pct").textContent = s.coverage_percent + "% covered";
+  document.getElementById("covered").textContent = s.covered.join(", ") || "None yet";
+  document.getElementById("pending").textContent = s.pending.join(", ") || "None";
+  const tb = document.getElementById("rows");
+  tb.innerHTML = "";
+  d.students.forEach(st => {
+    const tr = document.createElement("tr");
+    [st.student_id, st.questions, st.requests, st.ai_dependency_percent + "% (" + st.dependency_level + ")"]
+      .forEach(v => { const td = document.createElement("td"); td.textContent = v; tr.appendChild(td); });
+    tb.appendChild(tr);
+  });
+}
+load();
+</script>
+</body></html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Student - POLARIDE</title>
+<link rel="stylesheet" href="style.css"></head>
+<body>
+<nav><a href="index.html">Home</a><a href="teacher.html">Teacher</a><a href="dashboard.html">Dashboard</a></nav>
+<h1>Student Chat</h1>
+
+<label>Student ID</label>
+<input id="sid" value="s1">
+<label>Your question</label>
+<input id="q" placeholder="e.g. Solve 2x+3=11">
+<label>Your attempt (needed to unlock the next level of help)</label>
+<textarea id="a" rows="2" placeholder="Write what you tried..."></textarea>
+<button onclick="ask()">Ask POLARIDE</button>
+
+<div class="card" id="out" style="display:none">
+  <span class="badge" id="level"></span>
+  <p id="reply"></p>
+  <p class="muted" id="note"></p>
+</div>
+
+<script>
+async function ask() {
+  const body = {
+    student_id: document.getElementById("sid").value.trim(),
+    question: document.getElementById("q").value.trim(),
+    attempt: document.getElementById("a").value.trim() || null
+  };
+  const out = document.getElementById("out");
+  out.style.display = "block";
+  document.getElementById("reply").textContent = "Thinking...";
+  try {
+    const r = await fetch("/ask", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(body)});
+    const d = await r.json();
+    document.getElementById("level").textContent = "Level: " + (d.level_name || "-");
+    document.getElementById("reply").textContent = d.reply || d.error || "No reply";
+    let note = d.message || "";
+    if (d.guard_passed === false) note += " (Guard replaced an unsafe reply)";
+    document.getElementById("note").textContent = note;
+  } catch (e) {
+    document.getElementById("reply").textContent = "Could not reach the server.";
+  }
+}
+</script>
+</body></html>

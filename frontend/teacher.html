@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Teacher - POLARIDE</title>
+<link rel="stylesheet" href="style.css"></head>
+<body>
+<nav><a href="index.html">Home</a><a href="student.html">Student</a><a href="dashboard.html">Dashboard</a></nav>
+<h1>Teacher Upload</h1>
+<p class="muted">Upload a lecture (.txt or audio). POLARIDE summarizes it and finds the topics covered.</p>
+
+<input type="file" id="f">
+<button onclick="upload()">Upload lecture</button>
+
+<div class="card" id="out" style="display:none">
+  <h3>Summary</h3><p id="sum"></p>
+  <h3>Topics covered</h3><ul id="topics"></ul>
+</div>
+
+<script>
+async function upload() {
+  const file = document.getElementById("f").files[0];
+  if (!file) { alert("Choose a file first"); return; }
+  const out = document.getElementById("out");
+  out.style.display = "block";
+  document.getElementById("sum").textContent = "Processing...";
+  document.getElementById("topics").innerHTML = "";
+  const fd = new FormData();
+  fd.append("file", file);
+  try {
+    const r = await fetch("/lecture", {method: "POST", body: fd});
+    const d = await r.json();
+    if (d.error) { document.getElementById("sum").textContent = d.error; return; }
+    document.getElementById("sum").textContent = d.summary;
+    d.topics.forEach(t => {
+      const li = document.createElement("li");
+      li.textContent = t;
+      document.getElementById("topics").appendChild(li);
+    });
+  } catch (e) {
+    document.getElementById("sum").textContent = "Could not reach the server.";
+  }
+}
+</script>
+</body></html>
