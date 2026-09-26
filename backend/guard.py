@@ -17,11 +17,8 @@ def is_safe(question, level_name, instruction, reply):
         "for example by stating the final answer or the complete solution? "
         "Answer with exactly one word: LEAK or SAFE."
     )
-    r = client.models.generate_content(
-        model=MODEL,
-        contents=prompt,
-        config=types.GenerateContentConfig(temperature=0),
-    )
+    from backend.llm import _call_with_retry
+    r = _call_with_retry(MODEL, prompt, types.GenerateContentConfig(temperature=0))
     verdict = (r.text or "").upper()
     return "SAFE" in verdict and "LEAK" not in verdict
 

@@ -30,12 +30,10 @@ def process_lecture(filename, data, content_type):
         text = data.decode("utf-8", errors="ignore")
         contents = [PROMPT + "\n\nLecture text:\n" + text]
 
-    r = client.models.generate_content(
-        model=MODEL,
-        contents=contents,
-        config=types.GenerateContentConfig(
-            response_mime_type="application/json", temperature=0.2
-        ),
+    from backend.llm import _call_with_retry
+    r = _call_with_retry(
+        MODEL, contents,
+        types.GenerateContentConfig(response_mime_type="application/json", temperature=0.2),
     )
     result = json.loads(r.text)
 

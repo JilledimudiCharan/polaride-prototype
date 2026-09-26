@@ -1,12 +1,29 @@
 import os
+import time
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 
 load_dotenv()
 
-MODEL = "gemini-2.5-flash-lite"  # if you get a "model not found" error, change only this line
+MODEL = "gemini-3.5-flash"
 client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+
+
+def _call_with_retry(model, contents, config, tries=3, delay=2):
+    last_error = None
+    for attempt in range(1, tries + 1):
+        try:
+            return client.models.generate_content(model=model, contents=contents, config=config)
+        except Exception as e:
+            last_error = e
+            msg = str(e)
+            if "503" in msg or "UNAVAILABLE" in msg or "429" in msg:
+                if attempt < tries:
+                    time.sleep(delay * attempt)  # 2s, then 4s
+                    continue
+            raise
+    raise last_error
 
 
 def generate_reply(question, attempt, level_name, instruction, class_notes=""):
@@ -29,12 +46,8 @@ def generate_reply(question, attempt, level_name, instruction, class_notes=""):
     if attempt:
         prompt += f"\nStudent's attempt: {attempt}"
 
-    response = client.models.generate_content(
-        model=MODEL,
-        contents=prompt,
-        config=types.GenerateContentConfig(
-            system_instruction=system_prompt,
-            temperature=0.4,
-        ),
+    response = _call_with_retry(
+        MODEL, prompt,
+        types.GenerateContentConfig(system_instruction=system_prompt, temperature=0.4),
     )
     return response.text
